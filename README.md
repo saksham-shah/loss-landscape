@@ -24,7 +24,7 @@ Notice that the library versions are somewhat old. It is advised to try and run 
 - [scipy 0.19](https://www.scipy.org/install.html)
 
 
-**Pre-trained models**:
+**Pre-trained models (mini-project)**:
 The code accepts pre-trained PyTorch models for the CIFAR-10 dataset.
 To load the pre-trained model correctly, the model file should contain `state_dict`, which is saved from the `state_dict()` method.
 The default path for pre-trained networks is `cifar10/trained_nets`.
@@ -131,7 +131,7 @@ python h52vtp.py --surf_file path_to_surf_file --surf_name train_loss --zmax  10
 
 4. Select `Save screenshot` in the File menu to save the image.
 
-## Plotting the network trajectory (Mini-Project)
+## Plotting the network trajectory (mini-project)
 
 As the second part of you mini-project, you are required to plot the trajectory of a simple network. This can be done by:
 
