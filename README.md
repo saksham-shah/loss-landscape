@@ -13,6 +13,8 @@ The random direction(s) and loss surface values are stored in HDF5 (`.h5`) files
 ## Setup
 
 **Environment**: One or more multi-GPU node(s) with the following software/libraries installed:
+Notice that the library versions are somewhat old. It is advised to try and run the problem with the latest version of each first.
+
 - [PyTorch 0.4](https://pytorch.org/)
 - [openmpi 3.1.2](https://www.open-mpi.org/)
 - [mpi4py 2.0.0](https://mpi4py.scipy.org/docs/usrman/install.html)
@@ -20,6 +22,7 @@ The random direction(s) and loss surface values are stored in HDF5 (`.h5`) files
 - [h5py 2.7.0](http://docs.h5py.org/en/stable/build.html#install)
 - [matplotlib 2.0.2](https://matplotlib.org/users/installing.html)
 - [scipy 0.19](https://www.scipy.org/install.html)
+
 
 **Pre-trained models**:
 The code accepts pre-trained PyTorch models for the CIFAR-10 dataset.
@@ -30,6 +33,9 @@ Some of the pre-trained models and plotted figures can be downloaded here:
 - [ResNet-56](https://drive.google.com/a/cs.umd.edu/file/d/12oxkvfaKcPyyHiOevVNTBzaQ1zAFlNPX/view?usp=sharing) (10 MB)
 - [ResNet-56-noshort](https://drive.google.com/a/cs.umd.edu/file/d/1eUvYy3HaiCVHTzi3MHEZGgrGOPACLMkR/view?usp=sharing) (20 MB)
 - [DenseNet-121](https://drive.google.com/a/cs.umd.edu/file/d/1oU0nDFv9CceYM4uW6RcOULYS-rnWxdVl/view?usp=sharing) (75 MB)
+
+The above networks also contain the plots necessary for you to complete the first part (analysis) of your mini-project. 
+If you have trouble re-running the experiments, feel free to use the existing plots for your work.
 
 **Data preprocessing**:
 The data pre-processing method used for visualization should be consistent with the one used for model training.
@@ -46,6 +52,7 @@ mpirun -n 4 python plot_surface.py --mpi --cuda --model vgg9 --x=-0.5:1.5:401 --
 --model_file cifar10/trained_nets/vgg9_sgd_lr=0.1_bs=128_wd=0.0_save_epoch=1/model_300.t7 \
 --model_file2 cifar10/trained_nets/vgg9_sgd_lr=0.1_bs=8192_wd=0.0_save_epoch=1/model_300.t7 --plot
 ```
+
 - `--x=-0.5:1.5:401` sets the range and resolution for the plot.  The x-coordinates in the plot will run from -0.5 to 1.5 (the minimizers are located at 0 and 1), and the loss value will be evaluated at 401 locations along this line.
 - `--dir_type states` indicates the direction contains dimensions for all parameters as well as the statistics of the BN layers (`running_mean` and `running_var`). Note that ignoring `running_mean` and `running_var` cannot produce correct loss values when plotting two solutions togeather in the same figure.  
 - The two model files contain network parameters describing the two distinct minimizers of the loss function.  The plot will interpolate between these two minima.
@@ -75,12 +82,20 @@ mpirun -n 4 python plot_surface.py --mpi --cuda --model vgg9 --x=-1:1:51 \
 We can also customize the appearance of the 1D plots by calling `plot_1D.py` once the surface file is available.
 
 
-## Visualizing 2D loss contours
+## Visualizing 2D loss contours (mini-project)
 
 To plot the loss contours, we choose two random directions and normalize them in the same way as the 1D plotting.
 
 ```
 mpirun -n 4 python plot_surface.py --mpi --cuda --model resnet56 --x=-1:1:51 --y=-1:1:51 \
+--model_file cifar10/trained_nets/resnet56_sgd_lr=0.1_bs=128_wd=0.0005/model_300.t7 \
+--dir_type weights --xnorm filter --xignore biasbn --ynorm filter --yignore biasbn  --plot
+```
+
+You can also use the non-`mpi` version:
+
+```
+python plot_surface.py --cuda --model resnet56 --x=-1:1:51 --y=-1:1:51 \
 --model_file cifar10/trained_nets/resnet56_sgd_lr=0.1_bs=128_wd=0.0005/model_300.t7 \
 --dir_type weights --xnorm filter --xignore biasbn --ynorm filter --yignore biasbn  --plot
 ```
@@ -115,6 +130,17 @@ python h52vtp.py --surf_file path_to_surf_file --surf_name train_loss --zmax  10
 3. If the surface appears extremely skinny and needle-like, you may need to adjust the "transforming" parameters in the left control panel.  Enter numbers larger than 1 in the "scale" fields to widen the plot.
 
 4. Select `Save screenshot` in the File menu to save the image.
+
+## Plotting the network trajectory (Mini-Project)
+
+As the second part of you mini-project, you are required to plot the trajectory of a simple network. This can be done by:
+
+1. Defining the architecture inside a `cifar10/models/your_network.py`. Tip: Keep the architecture simple, as depth can play a big role in training. See `cifar10/models/simplenet.py` for reference. 
+2. Train the network with different sets of hyper-parameters for 300 epochs and save them using the format `model_{epoch}.pth`, at multiples of 10 epochs, under a `./your_model/` folder. 
+3. Run the code below to generate the plot.
+```
+python plot_trajectory.py --dataset cifar10 --model your_network --model_folder ./mymodels --start_epoch 0 --max_epoch 300 --save_epoch 10 --prefix model_ --suffix .pth
+```
 
 ## Reference
 
